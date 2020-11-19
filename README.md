@@ -38,9 +38,25 @@ $ npm run start
 # unit tests
 $ npm run test
 
-# e2e tests
-$ npm run test:e2e
-
 # test coverage
 $ npm run test:cov
+```
+
+## Make request local
+
+```bash
+curl --location --request POST 'localhost:3000/url-screenshot' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "url": "https://www.google.com/"
+}'
+```
+## Make request in production
+
+```bash
+curl --location --request POST 'https://igsdn6bghd.execute-api.us-east-2.amazonaws.com/prod/url-screenshot' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "url": "https://www.google.com/"
+}'
 ```

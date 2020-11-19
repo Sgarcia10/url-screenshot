@@ -1,38 +1,42 @@
-import { Test } from '@nestjs/testing';
-import { Logger } from '@nestjs/common';
-import { IHealthService } from 'src/domain/interfaces/health-service.interface';
+import { Test, TestingModule } from '@nestjs/testing';
+import * as request from 'supertest';
+import { INestApplication } from '@nestjs/common';
 import { HealthService } from 'src/core/service/health.service';
-import { ConfigService } from 'src/config/config.service';
 import { HealthDto } from 'src/common/dtos/response/health.dto';
 import { HealthController } from 'src/app/controllers/health.controller';
+import { HealthModule } from 'src/app/modules/health.module';
+import { ConfigModule } from 'src/config/config.module';
+import { LoggerModule } from 'src/domain/logger/logger.module';
 
-describe('HealthService', () => {
-  let healthService: IHealthService;
-  let configService: ConfigService;
+describe('HealthController (e2e)', () => {
+  let app: INestApplication;
 
-  beforeAll(async () => {
-    const module = await Test.createTestingModule({
-      providers: [HealthService, Logger, ConfigService],
-      controllers: [HealthController]
-    }).compile();
-    healthService = module.get<IHealthService>(HealthService);
-    configService = module.get<ConfigService>(ConfigService);
+  const health: HealthDto = { status: 'UP' };
+  const healthService = {
+    get: () => health
+  };
+
+  beforeEach(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      controllers: [HealthController],
+      imports: [HealthModule, ConfigModule, LoggerModule],
+      providers: [HealthService]
+    })
+      .overrideProvider(HealthService)
+      .useValue(healthService)
+      .compile();
+
+    app = moduleFixture.createNestApplication();
+    await app.init();
   });
 
-  describe('get', () => {
-    it('should return health', () => {
-      const result: HealthDto = { status: 'UP' };
+  it('/ (GET)', () => {
+    const expectedHealth: HealthDto = { status: 'UP' };
 
-      expect(healthService.get()).toMatchObject(result);
-    });
+    return request(app.getHttpServer()).get('/health').expect(200).expect(expectedHealth);
+  });
 
-    it('should throw Error when variable not exists', () => {
-      expect.assertions(1);
-      try {
-        configService.get('Var');
-      } catch (e) {
-        expect(e.message).toBe('Config variable does not exist: Var');
-      }
-    });
+  afterAll(async () => {
+    await app.close();
   });
 });

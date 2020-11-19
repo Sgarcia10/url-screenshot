@@ -8,8 +8,6 @@ import { IHealth } from 'src/api/health.interface copy';
 
 @Controller(HealthRoutes.health)
 export class HealthController implements IHealth {
-  @Inject()
-  private logger: Logger;
   constructor(@Inject(HealthService) private service: IHealthService) {}
 
   @Get()

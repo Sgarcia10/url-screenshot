@@ -20,5 +20,9 @@
             "tsConfig": "./tsconfig.test.json"
         }
     },
-    "setupFiles": ["dotenv/config"]
+    "setupFiles": ["dotenv/config"],
+    "collectCoverageFrom": [
+      "core/**/*.{ts,js}",
+      "app/controllers/**/*.{ts,js}"
+    ]
   }
