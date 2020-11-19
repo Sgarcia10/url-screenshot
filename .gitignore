@@ -8,3 +8,5 @@ jspm_packages
 
 dist
 tmp
+coverage
+.vscode
